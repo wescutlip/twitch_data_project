@@ -1,0 +1,89 @@
+-- Inspecting datasets
+SELECT *
+FROM stream
+LIMIT 20;
+
+SELECT *
+FROM chat
+LIMIT 20;
+
+-- identifying unique games in stream table
+SELECT DISTINCT game
+FROM stream;
+-- 20 unique entries, one of them is null value
+
+-- identifying unique channels in stream table
+SELECT DISTINCT channel
+FROM stream;
+-- there are 10 unique channels
+
+-- Views per games in stream table
+SELECT DISTINCT game, 
+  COUNT(*) AS "num_viewers"
+FROM stream
+GROUP BY 1
+ORDER BY 2 DESC;
+
+-- Views of League of Legends by country
+SELECT DISTINCT country, 
+  COUNT(*) AS "num_viewers"
+FROM stream
+WHERE game = "League of Legends"
+GROUP BY 1
+ORDER BY 2 DESC;
+
+-- Views on twitch grouped by player type
+SELECT DISTINCT player, 
+  COUNT(*) AS "num_viewers"
+FROM stream
+GROUP BY 1
+ORDER BY 2 DESC;
+
+-- Games grouped into genres along with views
+SELECT game, 
+  CASE
+    WHEN game = "League of Legends" 
+      THEN "MOBA"
+    WHEN game = "Dota 2" 
+      THEN "MOBA"
+    WHEN game = "Heroes of the Storm" 
+      THEN "MOBA"
+    WHEN game = "Counter-Strike: Global Offensive" 
+      THEN "FPS"
+    WHEN game = "DayZ" 
+      THEN "Survival"
+    WHEN game = "ARK: Survival Evolved" 
+      THEN "Survival"
+    ELSE "Other"
+  END AS "genre",
+  COUNT(*) AS "num_views"
+FROM stream
+GROUP BY 1
+ORDER BY 3 DESC;
+
+-- Inspecting time data from stream table
+SELECT time
+FROM stream
+LIMIT 10;
+
+-- Inspecting seconds in time data from stream table
+SELECT time,
+  STRFTIME('%S', time) AS "seconds"
+FROM stream
+GROUP BY 1
+LIMIT 20;
+
+-- Views per hour in the US from stream table
+SELECT STRFTIME('%H', time) AS "hour",
+  COUNT(*) AS "views_per_hour"
+FROM stream
+WHERE country = "US"
+GROUP BY 1
+ORDER BY 1;
+
+-- Joining stream and chat tables
+SELECT *
+FROM stream
+JOIN chat
+  ON stream.device_id = chat.device_id
+  LIMIT 10;
